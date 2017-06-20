@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Coche</title>
+	<style>
+		*{
+			margin:0px;
+			box-sizing:border-box;
+			font-family: ubuntu, sans-serif;
+		}
+		body{
+			background-image: url("coches/bgd.png");
+		}
+		.popup{
+			display: none;
+			width: 40%;
+			background: #FFFFFF;
+			border: 1px solid #444444;
+			border-radius: 3px;
+			background-clip: padding-box;
+			text-align: center;
+			margin: 10px auto;
+			padding: 20px;
+			position: relative;
+			transition: all 5s ease-in-out;
+		}
+		.popup input{
+			margin-top: 1.5em;
+			width: 80%;
+		}
+		#salpicadero{
+			position:absolute;
+			bottom:0px;
+			width: 100%;
+			font-family: ubuntu, sans-serif;
+		}
+		#salpicadero *{
+			border: solid 2px #0097CB;
+		}
+		#salpicadero table{
+			border-radius: 10px 10px 0px 0px;
+			background: #111111;
+		}
+		#salpicadero table th:first-child{
+			border-radius: 7px 0px 0px 0px;
+		}
+		#salpicadero table th:last-child{
+			border-radius: 0px 7px 0px 0px;
+		}
+
+		#salpicadero td{
+			color: #00CAFE;
+		}
+		#salpicadero th{
+			color: #FE4343;
+		}
+		#tablaColor{
+			margin-top: 1em;
+			border-spacing: 0.5em;
+			width: 100%;
+			height: 4em;
+		}
+		#blue, #yellow, #red, #green{
+			border: 1px inset #212121;
+		}
+		#blue{
+			background: #4A5E95;
+		}
+		#yellow{
+			background: #FFFF00;
+		}
+		#red{
+			background: #C93E29;
+		}
+		#green{
+			background: #65B657;
+		}
+	</style>
+	<script src="js/coche.js"></script>
+	<script>
+	var miCoche=new Coche();
+	var miColor="coches/blue.png";
+	window.onresize=function(){
+		if(parseInt(miCoche.avatar.style.top)+100>parseInt(window.innerHeight)){
+			miCoche.avatar.style.top=parseInt(window.innerHeight)-94+"px";
+		}
+		if(parseInt(miCoche.avatar.style.left)+94>parseInt(window.innerWidth)){
+			miCoche.avatar.style.left=parseInt(window.innerWidth)-94+"px";
+		}
+	}
+	window.onload=function(){
+		if(!confirm("Esto es una práctica de eventos JS.\nInformación:\n\tPulse la tecla 'v' para ver la consola del coche.\n\tPulse la tecla 'r' para repostar.\n\tPulse la tecla 'c' para cambiar el color del coche.\n\tPulse las teclas de dirección para mover el coche.¡No choque con los limetes de la ventana!")) window.location = "https://ishmilan.github.io";
+		// conectar la propiedad avatar
+		miCoche.avatar=document.getElementById("coche");
+		/* interceptar Teclado para mover y comandos*/
+		document.addEventListener("keydown",teclas);
+		document.getElementById("go").addEventListener("click",function(){
+			miCoche.repostar(parseInt(document.getElementById("gas").value));
+			document.getElementById("gasolinera").style.display="none";
+			this.setAttribute("disabled",true);
+		})
+	}
+	function cambiarColor(elem) {
+		document.getElementById("pintura").style.display="none";
+		miCoche.avatar.src="coches/"+elem.id+".png";
+		miColor=coche.src;
+	}
+	function teclas(evento){
+		var direcciones="ONES";
+		if (evento.keyCode>=37 && evento.keyCode<=40){
+			var valor=evento.keyCode-37;
+			var rotacion=new Array(90,180,270,360);
+			miCoche.avatar.style.transform="rotate("+rotacion[valor]+"deg)";
+			if(!miCoche.mover(direcciones.substring(valor,valor+1))){
+				if(miCoche.mensaje!=""){
+					alert(miCoche.mensaje);
+				}
+			}else if((parseInt(coche.style.top)+80)>=window.innerHeight||(parseInt(coche.style.left)+80)>=window.innerWidth||parseInt(coche.style.top)==-10 || parseInt(coche.style.left)==-10){
+				coche.src="coches/explosion.gif";
+				setTimeout(function(){
+					coche.style.top="50px";
+					coche.style.left="50px";
+					coche.src=miColor;
+				}, 1000);
+			}
+		}
+		if (evento.keyCode==82){/*Repostar*/
+			document.getElementById("gas").removeAttribute("disabled");
+			document.getElementById("gasolinera").style.display="block";
+		}
+		if (evento.keyCode==86){/*Ver Consola*/
+			setInterval(function(){
+				document.getElementById("salpicadero").innerHTML=miCoche.verConsola();
+			},200);
+		}
+		if (evento.keyCode==67){/*cambio de color*//*
+			var colores = new Array("coches/blue.png","coches/yellow.png","coches/red.png","coches/green.png");
+			var color = prompt("¿Qué color deseas para el avatar?\n1)Azul\n2)Amarillo\n3)Rojo\n4)Verde",2);*/
+			document.getElementById("pintura").style.display="block";
+		}
+	}
+	</script>
+</head>
+<body>
+	<img id="coche" src="coches/blue.png" style="position:absolute;top:50px;left:50px;height:94px;">
+	<div id="salpicadero"></div>
+	<div id="gasolinera" class="popup">
+		<label for="gas"><strong>¿Cuanto desea repostar?</strong></label>
+		<input type="range" id="gas" name="gas" value="0" min="0" max="100" step="2" disabled="disabled">
+		<input type="button" value="OK!" id="go">
+	</div>
+	<div id="pintura" class="popup">
+		<strong>¿Qué color desea para el coche?</strong>
+		<table id="tablaColor">
+			<tr>
+				<td id="blue" onclick="cambiarColor(this);"></td>
+				<td id="yellow" onclick="cambiarColor(this);"></td>
+				<td id="red" onclick="cambiarColor(this);"></td>
+				<td id="green" onclick="cambiarColor(this);"></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>
